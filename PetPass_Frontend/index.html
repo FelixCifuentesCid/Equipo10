@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - PetPass</title>
+  <link rel="stylesheet" href="estilos.css" />
+</head>
+<body>
+  <div class="navbar">
+    <h1>PetPass</h1>
+  </div>
+
+  <div class="login-container">
+    <h2>Iniciar Sesión</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Correo" required />
+      <input type="password" id="password" placeholder="Contraseña" required />
+      <button type="submit">Ingresar</button>
+    </form>
+    <p class="registro-link">¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a></p>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const response = await fetch("http://localhost:8080/api/duenos/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo: email, contrasena: password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Guardar info para ambos tipos de usuario
+        localStorage.setItem("idDueno", data.id);
+        localStorage.setItem("nombreDueno", data.nombre);
+        localStorage.setItem("tipoUsuario", data.tipo);
+
+        // Redirigir según tipo
+        if (data.tipo === "DUEÑO") {
+          window.location.href = "dueno.html";
+        } else if (data.tipo === "CLINICA") {
+          window.location.href = "clinica.html";
+        }
+      } else {
+        alert("Credenciales incorrectas o usuario no registrado");
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+

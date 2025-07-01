@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PetPass - Mascota</title>
+  <link rel="stylesheet" href="estilos.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <header class="header">
+    <h1>PetPass</h1>
+    <nav>
+      <a href="dueno.html">Inicio</a>
+      <a href="mascota.html">Mascota</a>
+      <a href="index.html">Cerrar Sesión</a>
+    </nav>
+  </header>
+
+  <main class="perfil-container">
+    <img src="https://image.made-in-china.com/202f0j00wLUokRrWaugv/Qr-Code-Pet-Tag-Modifiable-Pet-Online-Profile-Page-Multiple-Emergency-Contact.webp" alt="Foto Mascota" class="perfil-img" />
+
+    <div class="perfil-card info-mascota">
+      <h2>Información de la Mascota</h2>
+      <p><strong>Nombre:</strong> <span id="nombreMascota">Cargando...</span></p>
+      <p><strong>Especie:</strong> <span id="especieMascota">Cargando...</span></p>
+      <p><strong>Edad:</strong> <span id="edadMascota">Cargando...</span></p>
+      <p><strong>Vacunas:</strong> <span id="vacunasMascota">Cargando...</span></p>
+    </div>
+
+    <div class="btn-contenedor">
+      <button class="btn-amarillo" onclick="generarPDF('identidad')">Ver Documento de Identidad</button>
+      <button class="btn-amarillo" onclick="generarPDF('vacunas')">Ver Registro de Vacunas</button>
+    </div>
+  </main>
+
+<script>
+  let datosMascota = null;
+
+  document.addEventListener('DOMContentLoaded', async function () {
+    const duenoId = localStorage.getItem('idDueno');
+    if (!duenoId) {
+      alert('No hay dueño logeado');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/mascotas/dueno/${duenoId}`);
+      const mascotas = await response.json();
+
+      if (!Array.isArray(mascotas) || mascotas.length === 0) {
+        document.querySelector('.info-mascota').innerHTML = '<p>No hay mascotas registradas.</p>';
+        return;
+      }
+
+      const mascota = mascotas[mascotas.length - 1];
+      datosMascota = mascota;
+
+      document.getElementById('nombreMascota').textContent = mascota.nombre;
+      document.getElementById('especieMascota').textContent = mascota.especie;
+      document.getElementById('edadMascota').textContent = mascota.edad + ' años';
+      document.getElementById('vacunasMascota').textContent = mascota.vacunas;
+    } catch (error) {
+      console.error('Error al cargar mascota:', error);
+      alert('Hubo un problema al cargar la información de la mascota.');
+    }
+  });
+
+  function generarPDF(tipo) {
+    if (!datosMascota) {
+      alert("No hay datos de mascota para generar el PDF.");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(20);
+    doc.text("PetPass", 20, 20);
+
+    if (tipo === "identidad") {
+      doc.setFontSize(16);
+      doc.text("Documento de Identidad de la Mascota", 20, 35);
+    } else if (tipo === "vacunas") {
+      doc.setFontSize(16);
+      doc.text("Registro de Vacunas", 20, 35);
+    }
+
+    doc.setFontSize(12);
+    doc.text(`Nombre: ${datosMascota.nombre}`, 20, 50);
+    doc.text(`Especie: ${datosMascota.especie}`, 20, 60);
+    doc.text(`Edad: ${datosMascota.edad} años`, 20, 70);
+    doc.text(`Vacunas al día: ${datosMascota.vacunas}`, 20, 80);
+
+    const fileName = tipo === "identidad" ? "Documento_Identidad_Mascota.pdf" : "Registro_Vacunas_Mascota.pdf";
+    doc.save(fileName);
+  }
+</script>
+
+</body>
+</html>
+
+

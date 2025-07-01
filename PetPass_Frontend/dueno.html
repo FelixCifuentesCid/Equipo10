@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetPass - Dueño</title>
+  <link rel="stylesheet" href="estilos.css" />
+</head>
+<body>
+
+  <header class="header">
+    <h1>PetPass</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="mascota.html">Mascota</a>
+      <a href="index.html">Cerrar Sesión</a>
+    </nav>
+  </header>
+
+  <main class="perfil-container">
+    <!-- Saludo personalizado -->
+    <h2 id="saludo" style="margin-top: 1rem; text-align: center; color: #4B0082;"></h2>
+
+    <img src="https://plus.unsplash.com/premium_photo-1689568158814-3b8e9c1a9618?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8JTIzcGVyc29uYXxlbnwwfHwwfHx8MA%3D%3D" alt="Foto del dueño" class="perfil-img" />
+
+    <div class="perfil-card">
+      <h2>Información del Dueño</h2>
+      <p><strong>Nombre:</strong> <span id="nombreDueno">Cargando...</span></p>
+      <p><strong>Correo:</strong> <span id="correoDueno">Cargando...</span></p>
+      <p><strong>Teléfono:</strong> <span id="telefonoDueno">Cargando...</span></p>
+    </div>
+
+    <a href="registroMascota.html" class="btn-amarillo">Registrar Nueva Mascota</a>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Mostrar saludo con nombre desde localStorage
+      const nombre = localStorage.getItem("nombreDueno");
+      const saludoEl = document.getElementById("saludo");
+
+      if (nombre) {
+        saludoEl.textContent = `¡Hola, ${nombre}! Bienvenido a tu perfil.`;
+      } else {
+        saludoEl.textContent = "Bienvenido a tu perfil";
+      }
+
+      // Cargar datos del dueño desde el backend
+      const id = localStorage.getItem("idDueno");
+      console.log("ID del dueño desde localStorage:", id);
+      fetch(`http://localhost:8080/api/duenos/${id}`)
+
+        .then((res) => res.json())
+        .then((data) => {
+          document.getElementById("nombreDueno").textContent = data.nombre;
+          document.getElementById("correoDueno").textContent = data.correo;
+          document.getElementById("telefonoDueno").textContent = data.telefono;
+        })
+        .catch((error) => {
+          console.error("Error al cargar datos del dueño:", error);
+        });
+    });
+
+    function verDocumentoIdentidad() {
+      alert("Aquí irá el PDF del dueño (en desarrollo)");
+    }
+  </script>
+</body>
+</html>
+
+
+

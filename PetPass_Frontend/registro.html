@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro - PetPass</title>
+  <link rel="stylesheet" href="estilos.css"/>
+</head>
+<body>
+
+  <div class="navbar">
+    <h1>PetPass</h1>
+  </div>
+
+  <div class="registro-container">
+    <h2>Crear Cuenta</h2>
+    <form id="registroForm">
+      <input type="text" id="nombre" placeholder="Nombre completo" required />
+      <input type="email" id="correo" placeholder="Correo electrónico" required />
+      <input type="text" id="telefono" placeholder="Teléfono" />
+      <input type="password" id="contrasena" placeholder="Contraseña" required />
+
+      <!-- CAMPO: Tipo de Usuario con tilde -->
+      <label for="tipo">Tipo de Usuario:</label>
+      <select id="tipo" required>
+        <option value="">Selecciona...</option>
+        <option value="DUEÑO">Dueño</option>
+        <option value="CLINICA">Clínica</option>
+      </select>
+
+      <button type="submit">Registrarse</button>
+    </form>
+    <p class="registro-link">¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a></p>
+  </div>
+
+<script>
+  document.getElementById("registroForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const nuevoUsuario = {
+      nombre: document.getElementById("nombre").value,
+      correo: document.getElementById("correo").value,
+      telefono: document.getElementById("telefono").value,
+      contrasena: document.getElementById("contrasena").value,
+      tipo: document.getElementById("tipo").value // "DUEÑO" o "CLÍNICA"
+    };
+
+    console.log("Nuevo usuario a registrar:", nuevoUsuario); // Para debug
+
+    try {
+      const response = await fetch("http://localhost:8080/api/duenos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevoUsuario)
+      });
+
+      if (response.ok) {
+        alert("Registro exitoso. Ahora puedes iniciar sesión.");
+        window.location.href = "index.html";
+      } else {
+        alert("Error al registrar. Verifica los datos.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Hubo un problema con el registro.");
+    }
+  });
+</script>
+
+</body>
+</html>
+
+

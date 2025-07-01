@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetPass - Clínica</title>
+  <link rel="stylesheet" href="estilos.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <header class="header">
+    <h1>PetPass</h1>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="mascota.html">Mascota</a>
+      <a href="index.html">Cerrar Sesión</a>
+    </nav>
+  </header>
+
+  <main class="perfil-container">
+    <img src="https://static.vecteezy.com/system/resources/previews/006/324/202/non_2x/logo-for-veterinary-clinic-applicable-for-a-pet-shop-vector.jpg" alt="Foto de la clínica" class="perfil-img" />
+    
+    <div class="perfil-card">
+      <h2>Información de la Clínica</h2>
+      <p><strong>Nombre:</strong> <span id="nombreClinica">Cargando...</span></p>
+      <p><strong>Correo:</strong> <span id="correoClinica">Cargando...</span></p>
+      <p><strong>Teléfono:</strong> <span id="telefonoClinica">Cargando...</span></p>
+    </div>
+
+    <div class="btn-contenedor">
+      <button class="btn-amarillo" onclick="verDocumentoClinica()">Ver Certificado Veterinario</button>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      const idClinica = localStorage.getItem("idDueno");
+
+      if (!idClinica) {
+        alert("No hay sesión activa. Inicia sesión nuevamente.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8080/api/duenos/${idClinica}`);
+        const data = await response.json();
+
+        document.getElementById("nombreClinica").textContent = data.nombre;
+        document.getElementById("correoClinica").textContent = data.correo;
+        document.getElementById("telefonoClinica").textContent = data.telefono || 'No registrado';
+
+        // Guardamos los datos para el PDF
+        window.clinicaInfo = data;
+
+      } catch (error) {
+        console.error("Error al cargar datos de la clínica:", error);
+        alert("Hubo un problema al cargar los datos.");
+      }
+    });
+
+    function verDocumentoClinica() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFont("Helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text("Certificado Veterinario", 20, 30);
+
+      doc.setFont("Helvetica", "normal");
+      doc.setFontSize(12);
+      doc.text(`Nombre de la Clínica: ${window.clinicaInfo?.nombre || 'No disponible'}`, 20, 50);
+      doc.text(`Correo: ${window.clinicaInfo?.correo || 'No disponible'}`, 20, 60);
+      doc.text(`Teléfono: ${window.clinicaInfo?.telefono || 'No disponible'}`, 20, 70);
+      doc.text(`Emitido por: PetPass 🐾`, 20, 90);
+
+      doc.save("certificado_clinica.pdf");
+    }
+  </script>
+</body>
+</html>
+
+
