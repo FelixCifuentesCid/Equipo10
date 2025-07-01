@@ -1,0 +1,28 @@
+# === Java ===
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+
+# IntelliJ / VS Code / Eclipse config files
+.idea/
+*.iml
+.vscode/
+*.classpath
+*.project
+*.settings/
+
+# Maven / Gradle
+target/
+build/
+
+# === Node / JavaScript ===
+node_modules/
+dist/
+.env
+
+# === General ===
+.DS_Store
+Thumbs.db
